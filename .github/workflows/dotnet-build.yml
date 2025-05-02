@@ -1,4 +1,4 @@
-name: .NET Build Pipeline
+name: Build .NET
 
 on: [push]
 
@@ -7,36 +7,22 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
       
-    - name: Setup .NET SDK
+    - name: Setup .NET 8
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'  # Altere conforme necessário
+        dotnet-version: '8.0.x'
         
-    - name: Find and validate .NET projects
-      id: find-projects
+    - name: Find projects
+      id: find
       run: |
-        echo "### Procurando projetos .NET ###"
-        # Corrigido: usando * em vez de **
-        PROJECTS=$(find . -name "*.csproj" -o -name "*.sln" | grep . || true)
+        files=$(find . -name "*.csproj" -o -name "*.sln")
+        echo "$files" | tee found.txt
+        echo "files=${files}" >> $GITHUB_OUTPUT
         
-        if [ -z "$PROJECTS" ]; then
-          echo "::error::Nenhum projeto .NET encontrado!"
-          echo "Estrutura do repositório:"
-          ls -R
-          exit 1
-        fi
-        
-        echo "Projetos encontrados:"
-        echo "$PROJECTS"
-        echo "projects=${PROJECTS}" >> $GITHUB_OUTPUT
-        
-    - name: Build all projects
+    - name: Run build
       run: |
-        # Itera sobre todos os projetos encontrados
-        while IFS= read -r project; do
-          echo "🏗️ Building $project"
-          dotnet build "$project" --configuration Release
-        done <<< "${{ steps.find-projects.outputs.projects }}"
+        while read -r proj; do
+          dotnet build "$proj" -c Release
+        done < found.txt
