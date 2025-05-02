@@ -1,0 +1,24 @@
+name: .NET Build and Test
+
+on:  # <-- Esta seção DEVE existir e estar formatada corretamente
+  push:
+    branches: [ "main" ]  # Aciona em pushes para a branch main
+  
+  schedule:
+    - cron: '0 * * * *'   # Executa a cada hora (ajuste se necessário)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'  # Altere para sua versão
+        
+    - name: Build
+      run: dotnet build --configuration Release
+   
