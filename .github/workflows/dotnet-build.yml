@@ -1,4 +1,4 @@
-name: .NET Build Pipeline
+name: .NET 8.0 Build Pipeline
 
 on: [push]
 
@@ -10,22 +10,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Setup .NET
+    - name: Setup .NET 8.x SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0.x'
+        dotnet-version: '8.0.x'  # Versão explicitamente definida
         
-    - name: Find and list .NET projects
-      id: find-projects
-      run: |
-        # Encontra o primeiro arquivo .csproj ou .sln
-        PROJECT_FILE=$(find . -name "*.csproj" -o -name "*.sln" | head -n 1)
-        if [ -z "$PROJECT_FILE" ]; then
-          echo "::error::Nenhum arquivo .csproj ou .sln encontrado!"
-          exit 1
-        fi
-        echo "PROJECT_FILE=${PROJECT_FILE}" >> $GITHUB_OUTPUT
-        echo "📌 Arquivo de projeto encontrado: ${PROJECT_FILE}"
-        
+    - name: List SDKs instalados
+      run: dotnet --list-sdks
+      
     - name: Build
-      run: dotnet build "${{ steps.find-projects.outputs.PROJECT_FILE }}" --configuration Release
+      run: dotnet build --configuration Release
