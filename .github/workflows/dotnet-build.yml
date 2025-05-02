@@ -13,19 +13,30 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'  # Altere para a versão do seu projeto
+        dotnet-version: '8.0.x'  # Altere conforme necessário
         
-    - name: Debug - List directory structure
+    - name: Find and validate .NET projects
+      id: find-projects
       run: |
-        echo "### Estrutura do repositório ###"
-        ls -R
-        echo ""
-        echo "### Arquivos .NET encontrados ###"
-        find . -name "*.csproj" -o -name "*.sln" || echo "Nenhum arquivo .NET encontrado"
+        echo "### Procurando projetos .NET ###"
+        # Corrigido: usando * em vez de **
+        PROJECTS=$(find . -name "*.csproj" -o -name "*.sln" | grep . || true)
         
-    - name: Build (método automático seguro)
+        if [ -z "$PROJECTS" ]; then
+          echo "::error::Nenhum projeto .NET encontrado!"
+          echo "Estrutura do repositório:"
+          ls -R
+          exit 1
+        fi
+        
+        echo "Projetos encontrados:"
+        echo "$PROJECTS"
+        echo "projects=${PROJECTS}" >> $GITHUB_OUTPUT
+        
+    - name: Build all projects
       run: |
-        # Método 1: Tenta encontrar e construir qualquer projeto/solução
-        if find . -name "*.csproj" -o -name "*.sln" | grep -q .; then
-          for project in $(find . -name "*.csproj" -o -name "*.sln"); do
-            echo "🏗
+        # Itera sobre todos os projetos encontrados
+        while IFS= read -r project; do
+          echo "🏗️ Building $project"
+          dotnet build "$project" --configuration Release
+        done <<< "${{ steps.find-projects.outputs.projects }}"
