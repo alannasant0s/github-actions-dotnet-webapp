@@ -1,4 +1,4 @@
-name: .NET Build
+name: .NET Build Pipeline
 
 on: [push]
 
@@ -7,12 +7,23 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
-    
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0.x'
-    
+        dotnet-version: '6.0.x'  # Altere para sua versão
+        
+    - name: List project files (Debug)
+      run: |
+        echo "Estrutura do projeto:"
+        ls -R
+        echo ""
+        echo "Arquivos .NET encontrados:"
+        find . -name "*.csproj" -o -name "*.sln"
+        
     - name: Build
-      run: dotnet build YourProject.sln  # Substitua pelo seu .csproj ou .sln
+      run: |
+        # Substitua pelo caminho do SEU arquivo .csproj ou .sln
+        dotnet build ./src/YourProject/YourProject.csproj --configuration
