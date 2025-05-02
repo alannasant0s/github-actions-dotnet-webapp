@@ -15,15 +15,12 @@ jobs:
       with:
         dotnet-version: '6.0.x'  # Altere para sua versão
         
-    - name: List project files (Debug)
+    - name: Find .NET projects
       run: |
-        echo "Estrutura do projeto:"
-        ls -R
-        echo ""
         echo "Arquivos .NET encontrados:"
         find . -name "*.csproj" -o -name "*.sln"
         
     - name: Build
       run: |
-        # Substitua pelo caminho do SEU arquivo .csproj ou .sln
-        dotnet build ./src/YourProject/YourProject.csproj --configuration
+        # Comando corrigido - note o formato correto
+        dotnet build ./src/YourProject/YourProject.csproj --configuration Release
