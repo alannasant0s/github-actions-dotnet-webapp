@@ -1,4 +1,4 @@
-name: .NET 8.0 Build Pipeline
+name: .NET Build Pipeline
 
 on: [push]
 
@@ -10,13 +10,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Setup .NET 8.x SDK
+    - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'  # Versão explicitamente definida
+        dotnet-version: '8.0.x'  # Altere para a versão do seu projeto
         
-    - name: List SDKs instalados
-      run: dotnet --list-sdks
-      
-    - name: Build
-      run: dotnet build --configuration Release
+    - name: Debug - List directory structure
+      run: |
+        echo "### Estrutura do repositório ###"
+        ls -R
+        echo ""
+        echo "### Arquivos .NET encontrados ###"
+        find . -name "*.csproj" -o -name "*.sln" || echo "Nenhum arquivo .NET encontrado"
+        
+    - name: Build (método automático seguro)
+      run: |
+        # Método 1: Tenta encontrar e construir qualquer projeto/solução
+        if find . -name "*.csproj" -o -name "*.sln" | grep -q .; then
+          for project in $(find . -name "*.csproj" -o -name "*.sln"); do
+            echo "🏗
