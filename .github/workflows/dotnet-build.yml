@@ -1,24 +1,27 @@
-name: .NET Build and Test
+name: .NET Build Workflow
 
-on:  # <-- Esta seção DEVE existir e estar formatada corretamente
+# SEÇÃO ON CORRETA - DEFINA PELO MENOS 1 TRIGGER
+on:
+  # Trigger para push na branch main
   push:
-    branches: [ "main" ]  # Aciona em pushes para a branch main
+    branches: [ "main" ]
   
+  # Trigger agendado (opcional)
   schedule:
-    - cron: '0 * * * *'   # Executa a cada hora (ajuste se necessário)
+    - cron: '30 * * * *'  # Executa no minuto 30 de cada hora
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
-    
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '6.0.x'  # Altere para sua versão
+        dotnet-version: '6.0.x'
         
     - name: Build
       run: dotnet build --configuration Release
-   
